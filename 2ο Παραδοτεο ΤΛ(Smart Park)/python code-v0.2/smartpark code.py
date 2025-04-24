@@ -14,6 +14,7 @@ from kivy.uix.image import Image
 from kivy.core.image import Image as CoreImage
 import io
 import random
+from kivy.uix.scrollview import ScrollView
 
 
 # ----------- Home Screen ------------
@@ -44,7 +45,9 @@ class HomeScreen(BoxLayout):
         self.add_widget(res_info_btn)
 
         # κουμπί tech supp
-        self.add_widget(self.create_button("Technical Support"))
+        tech_supp_btn = self.create_button("Technical Support")
+        tech_supp_btn.bind(on_press=self.go_to_technical_support)
+        self.add_widget(tech_supp_btn)
 
         # κουμπί Profile
         profile_btn = self.create_button("Profile")
@@ -99,7 +102,63 @@ class HomeScreen(BoxLayout):
     def go_to_reservation_info(self, instance):
         self.screen_manager.current = 'reservation_info'
 
+    def go_to_technical_support(self, instance):
+        self.screen_manager.current = 'technical_support'
 
+        
+
+# ----------- Technical Support Screen ------------
+class TechnicalSupportScreen(BoxLayout):
+    def __init__(self, screen_manager, **kwargs):
+        super().__init__(orientation='vertical', padding=dp(20), spacing=dp(10), **kwargs)
+        self.screen_manager = screen_manager
+        self.messages = []
+
+        # Τίτλος
+        self.add_widget(Label(text="[b]Technical Support[/b]", markup=True, font_size=dp(22)))
+
+        # Περιοχή Chat (Scrollable)
+        self.chat_area = ScrollView(size_hint=(1, 0.8))
+        self.chat_box = BoxLayout(orientation='vertical', size_hint_y=None)
+        self.chat_box.bind(minimum_height=self.chat_box.setter('height'))
+        self.chat_area.add_widget(self.chat_box)
+        self.add_widget(self.chat_area)
+
+        # Πεδίο Εισαγωγής Μηνύματος
+        self.message_input = TextInput(size_hint_y=None, height=dp(40), multiline=False, hint_text="Πληκτρολογήστε το μήνυμά σας...")
+        self.add_widget(self.message_input)
+
+        # Κουμπί Αποστολής
+        send_btn = Button(text="Αποστολή", size_hint_y=None, height=dp(50))
+        send_btn.bind(on_press=self.send_message)
+        self.add_widget(send_btn)
+
+        # Πίσω Κουμπί
+        back_btn = Button(text="Πίσω", size_hint_y=None, height=dp(40))
+        back_btn.bind(on_press=self.go_back)
+        self.add_widget(back_btn)
+
+    def send_message(self, instance):
+        message = self.message_input.text
+        if message.strip():
+            # Προσθήκη του μηνύματος του χρήστη
+            user_message = Label(text=f"[b]Εσύ:[/b] {message}", markup=True, font_size=dp(14))
+            self.chat_box.add_widget(user_message)
+
+            # Προσθήκη του μηνύματος του admin (dummy)
+            admin_message = Label(text=f"[b]Admin:[/b] Ευχαριστούμε για το μήνυμά σας! Θα σας βοηθήσουμε σύντομα.", markup=True, font_size=dp(14))
+            self.chat_box.add_widget(admin_message)
+
+            # Καθαρισμός του πεδίου εισαγωγής
+            self.message_input.text = ''
+
+            # Ανάληψη κύλισης στο κάτω μέρος του chat
+            self.chat_area.scroll_y = 0
+
+    def go_back(self, instance):
+        self.screen_manager.current = 'home'
+
+        
 # ----------- Reservation Form Screen ------------
 class ReservationFormScreen(BoxLayout):
     def __init__(self, screen_manager, **kwargs):
@@ -204,6 +263,8 @@ class ProfileScreen(BoxLayout):
         self.edit_btn.bind(on_press=self.toggle_edit)
         self.add_widget(self.edit_btn)
 
+        
+
         # Πίσω
         back_btn = Button(text="Πίσω", size_hint_y=None, height=dp(40))
         back_btn.bind(on_press=self.go_back)
@@ -226,7 +287,19 @@ class ProfileScreen(BoxLayout):
             self.email_label.text = f"Email: {email}"
             self.add_widget(self.name_label)
             self.add_widget(self.email_label)
+           
             self.edit_btn.text = "Edit"
+
+             # Εμφάνιση μηνύματος "Saved changes"
+            saved_label = Label(
+                text="[b]Saved changes[/b]",
+                markup=True,
+                color=(0, 0.6, 0, 1),
+                font_size=dp(14),
+                size_hint_y=None,
+                height=dp(30)
+            )
+            self.add_widget(saved_label)
 
         self.add_widget(self.edit_btn)
 
@@ -236,6 +309,9 @@ class ProfileScreen(BoxLayout):
         self.add_widget(back_btn)
 
         self.editing = not self.editing
+
+
+  
 
     def go_back(self, instance):
         self.screen_manager.current = 'home'
@@ -264,10 +340,69 @@ class ReservationInfoScreen(BoxLayout):
         qr_image = Image(texture=im.texture)
         self.add_widget(qr_image)
 
+
+
+        # Κουμπί Πληρωμής Προστιμού
+        pay_fine_btn = Button(
+            text="Πληρωμή Προστιμού",
+            size_hint_y=None,
+            height=dp(50),
+            background_color=(1, 0.3, 0.3, 1),
+            color=(1, 1, 1, 1)
+        )
+
+        self.add_widget(pay_fine_btn)
+      
+      
+
+        # Κουμπί Ακύρωσης Κράτησης
+        cancel_btn = Button(
+            text="Ακύρωση Κράτησης",
+            size_hint_y=None,
+            height=dp(50),
+            background_color=(1, 0.3, 0.3, 1),  # Κόκκινο για την ακύρωση
+            color=(1, 1, 1, 1)
+        )
+        cancel_btn.bind(on_press=self.cancel_reservation)
+        self.add_widget(cancel_btn)
+
+     
+
         # Πίσω κουμπί
         back_btn = Button(text="Πίσω", size_hint_y=None, height=dp(44))
         back_btn.bind(on_press=self.go_back)
         self.add_widget(back_btn)
+
+
+
+    def cancel_reservation(self, instance):
+        # Εδώ διαγράφουμε τα δεδομένα κράτησης 
+        self.reservation_data = None  # Διαγραφή των δεδομένων
+        self.clear_widgets()  # Καθαρισμός των widgets
+
+        # Εμφάνιση μηνύματος ακύρωσης
+        cancel_message = Label(
+            text="[b]Reservation Cancelled[/b]",
+            markup=True,
+            font_size=dp(18),
+            color=(0.8, 0, 0, 1),
+            size_hint_y=None,
+            height=dp(30)
+        )
+        self.add_widget(cancel_message)
+
+        # Πίσω κουμπί για να επιστρέψει ο χρήστης στην αρχική οθόνη
+        back_btn = Button(
+            text="Πίσω στην Αρχική",
+            size_hint_y=None,
+            height=dp(44),
+            background_color=(0.3, 0.6, 0.9, 1),
+            color=(1, 1, 1, 1)
+        )
+        back_btn.bind(on_press=self.go_back)
+        self.add_widget(back_btn)
+
+ 
 
     def go_back(self, instance):
         self.screen_manager.current = 'home'
@@ -299,9 +434,16 @@ class SmartParkApp(App):
         info_screen.add_widget(ReservationInfoScreen(sm))
         sm.add_widget(info_screen)
 
+        # Technical Support screen
+        tech_support_screen = Screen(name='technical_support')
+        tech_support_screen.add_widget(TechnicalSupportScreen(sm))
+        sm.add_widget(tech_support_screen)
+
         return sm
 
 
 if __name__ == "__main__":
     SmartParkApp().run()
+
+
 
