@@ -226,7 +226,6 @@ class ProfileScreen(BoxLayout):
             self.email_label.text = f"Email: {email}"
             self.add_widget(self.name_label)
             self.add_widget(self.email_label)
-            self.add_widget(self.subscription_label)
             self.edit_btn.text = "Edit"
 
         self.add_widget(self.edit_btn)
