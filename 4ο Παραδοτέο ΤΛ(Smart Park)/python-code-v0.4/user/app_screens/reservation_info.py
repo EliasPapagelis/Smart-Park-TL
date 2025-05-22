@@ -29,7 +29,7 @@ class ReservationInfoScreen(BoxLayout):
 
         reservation = get_last_reservation()
         if reservation:
-            res_id, parking, spot, start_date, end_date = reservation
+            res_id, parking, spot, start_date, end_date, status = reservation
             reservation_data = f"Reservation ID: {res_id}\nParking: {parking}\nSpot: {spot}\nFrom: {start_date}\nTo: {end_date}"
 
             qr = qrcode.make(reservation_data)
@@ -50,6 +50,7 @@ class ReservationInfoScreen(BoxLayout):
                 color=(1, 1, 1, 1)
             )
             self.add_widget(pay_fine_btn)
+            pay_fine_btn.bind(on_press=self.go_to_payment)
 
             # Κουμπί Ακύρωσης Κράτησης
             cancel_btn = Button(
@@ -78,3 +79,8 @@ class ReservationInfoScreen(BoxLayout):
 
     def go_back(self, instance):
         self.screen_manager.current = 'home'
+
+
+    def go_to_payment(self, instance):
+        self.screen_manager.current = 'payment'
+   

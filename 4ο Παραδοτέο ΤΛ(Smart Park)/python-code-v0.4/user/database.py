@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+import random
 
 def init_db():
     conn = sqlite3.connect("smartpark.db")
@@ -21,8 +22,20 @@ def init_db():
             spot TEXT NOT NULL,
             date_from TEXT NOT NULL,
             date_to TEXT NOT NULL
+             
         )
     ''')
+
+    cursor.execute("PRAGMA table_info(reservations)")
+    columns = [row[1] for row in cursor.fetchall()]
+
+    # Αν δεν υπάρχει το status, πρόσθεσέ το
+    if 'status' not in columns:
+        cursor.execute('''
+            ALTER TABLE reservations
+            ADD COLUMN status TEXT DEFAULT 'pending'
+        ''')
+
     conn.commit()
     conn.close()
 
@@ -87,6 +100,25 @@ def delete_last_reservation():
     conn = sqlite3.connect("smartpark.db")
     cursor = conn.cursor()
     cursor.execute("DELETE FROM reservations WHERE id = (SELECT id FROM reservations ORDER BY id DESC LIMIT 1)")
+    conn.commit()
+    conn.close()
+
+def get_fine_amount(reservation_id):
+    # Για παράδειγμα, επιστρέφουμε τυχαίο πρόστιμο μεταξύ 10€ και 100€
+    return random.randint(10, 100)
+
+
+
+def mark_fine_paid(reservation_id):
+    conn = sqlite3.connect("smartpark.db")
+    cursor = conn.cursor()
+    # Εδώ θα μπορούσες π.χ. να ενημερώσεις ένα πεδίο status, 
+    # ή να καταχωρήσεις σε πίνακα payments. Για demo:
+    cursor.execute("""
+        UPDATE reservations 
+        SET status = 'paid'
+        WHERE id = ?
+    """, (reservation_id,))
     conn.commit()
     conn.close()
 

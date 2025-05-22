@@ -22,6 +22,7 @@ from app_screens.reservation_info import ReservationInfoScreen
 from app_screens.technical_support import TechnicalSupportScreen
 from app_screens.rent_spot import RentSpotScreen
 from database import init_db
+from app_screens.payment_screen import PaymentScreen
 
 
 
@@ -60,6 +61,10 @@ class SmartParkApp(App):
         rent_spot_screen = Screen(name='rent_spot')
         rent_spot_screen.add_widget(RentSpotScreen(sm))
         sm.add_widget(rent_spot_screen)
+
+        payment_screen = Screen(name='payment')
+        payment_screen.add_widget(PaymentScreen(sm))
+        sm.add_widget(payment_screen)
 
         return sm
 
