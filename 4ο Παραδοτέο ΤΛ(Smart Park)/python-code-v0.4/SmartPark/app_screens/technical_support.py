@@ -35,11 +35,17 @@ class TechnicalSupportScreen(BoxLayout):
         self.chat_box.bind(minimum_height=self.chat_box.setter('height'))
         self.chat_area.add_widget(self.chat_box)
         # Φόρτωση αποθηκευμένων μηνυμάτων από βάση
+        
         for sender, msg, timestamp in load_support_messages():
-         label = Label(text=f"[b]Εσύ:[/b] {msg}", markup=True, font_size=dp(14))
-         self.chat_box.add_widget(label)
-
+            prefix = "[b]Admin:[/b]" if sender == 'admin' else "[b]Εσύ:[/b]"
+            label = Label(
+                text=f"{prefix} {msg}\n[i]{timestamp.split('T')[0]} {timestamp.split('T')[1][:8]}[/i]",
+                markup=True, font_size=dp(14), size_hint_y=None, height=dp(60)
+            )
+            self.chat_box.add_widget(label)
         self.add_widget(self.chat_area)
+
+        
         
    
         # Πεδίο Εισαγωγής Μηνύματος

@@ -1,10 +1,4 @@
-import sys, os
 
-# Διαδρομή προς τον φάκελο user που περιέχει τη βάση
-USER_DIR = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), '..', '..', 'user'
-))
-sys.path.insert(0, USER_DIR)
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
